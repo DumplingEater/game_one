@@ -2,38 +2,59 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[ExecuteInEditMode]
+[RequireComponent (typeof (Rigidbody))]
 public class CelestialBody : MonoBehaviour{
 
     // relatively simple starting parameters
-    public float mass;
     public float radius;
+    public float surfaceGravity;
     public Vector3 initialVelocity;
-    Vector3 currentVelocity;
+    public string bodyName = "Unnamed";
+    Transform meshHolder;
 
-    // Start is called before the first frame update
-    void Start(){
-
-    }
+    public Vector3 velocity {get; private set;}
+    public float mass {get; private set;}
+    Rigidbody rb;
 
     // called when the object is created
-    void Initialize(){
-        currentVelocity = initialVelocity;
+    void Awake(){
+        rb = GetComponent<Rigidbody>();
+        rb.mass = mass;
+        velocity = initialVelocity;
     }
 
-    // called each frame to update the velocity
-    void UpdateVelocity(CelestialBody[] bodies, float dt){
-        foreach(var body in bodies){ // for each body passed in
-            if(body != this){ // if it's not this body
-                float sqrDst = (body.GetComponent<Rigidbody>().position - GetComponent<Rigidbody>().position).sqrMagnitude;
-                Vector3 forceDir = (body.GetComponent<Rigidbody>().position - GetComponent<Rigidbody>().position).normalized;
-                Vector3 acceleration = forceDir * Universe.gravitationalConstant * body.mass / sqrDst;
-                currentVelocity += acceleration * dt;
-            }
+    // update velocity that is called from the sim controller
+    public void UpdateVelocity (Vector3 acceleration, float timeStep) {
+        velocity += acceleration * timeStep;
+    }
+
+    // called from sim controller to update position
+    public void UpdatePosition(float timeStep){
+        rb.MovePosition(rb.position + velocity * timeStep);
+    }
+
+    // called when a value is changed in the editor to validate properties
+    void OnValidate(){
+        mass = surfaceGravity * radius * radius / Universe.gravitationalConstant;
+        meshHolder = transform.GetChild(0);
+        meshHolder.localScale = Vector3.one * radius;
+        gameObject.name = bodyName;
+    }
+
+    //
+    // Properties
+    //
+
+    public Rigidbody Rigidbody {
+        get {
+            return rb;
         }
     }
 
-    // Update is called once per frame
-    void Update(){
-
+    public Vector3 Position {
+        get {
+            return rb.position;
+        }
     }
 }
