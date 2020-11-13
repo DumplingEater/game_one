@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [ExecuteInEditMode]
-public class SimulationController : MonoBehaviour
+public class SimulationSystem : MonoBehaviour
 {
     CelestialBody[] bodies;
-    static SimulationController instance;
+    static SimulationSystem instance;
 
     // called on script creation
     void Awake(){
@@ -54,10 +54,10 @@ public class SimulationController : MonoBehaviour
     }
 
     // instance property
-    static SimulationController Instance{
+    static SimulationSystem Instance{
         get{
             if (instance == null){
-                instance = FindObjectOfType<SimulationController> ();
+                instance = FindObjectOfType<SimulationSystem> ();
             }
             return instance;
         }
