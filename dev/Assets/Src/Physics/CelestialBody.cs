@@ -52,7 +52,7 @@ public class CelestialBody : MonoBehaviour{
         }
     }
 
-    public Vector3 Position {
+    public Vector3 position {
         get {
             return rb.position;
         }

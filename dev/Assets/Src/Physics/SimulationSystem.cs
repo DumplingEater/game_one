@@ -19,7 +19,7 @@ public class SimulationSystem : MonoBehaviour
     void FixedUpdate(){
         // calculate and apply acceleration to each body
         for (int i = 0; i < bodies.Length; i++){
-            Vector3 acceleration = CalculateAcceleration(bodies[i].Position, bodies[i]);
+            Vector3 acceleration = CalculateAcceleration(bodies[i].position, bodies[i]);
             bodies[i].UpdateVelocity(acceleration, Universe.physicsTimeStep); //  do we need to access this off of universe?
         }
 
@@ -34,8 +34,8 @@ public class SimulationSystem : MonoBehaviour
         Vector3 acceleration = Vector3.zero; // init acceleration to 0
         foreach(var body in Instance.bodies){ // iterate over all the bodies
             if(body != ignoreBody){ // if we're not ignoring this body
-                float sqrDst = (body.Position - point).sqrMagnitude; // square distance
-                Vector3 forceDir = (body.Position - point).normalized; // displacement vector
+                float sqrDst = (body.position - point).sqrMagnitude; // square distance
+                Vector3 forceDir = (body.position - point).normalized; // displacement vector
                 acceleration += forceDir * Universe.gravitationalConstant * body.mass / sqrDst; // newton's g law
             }
         }
