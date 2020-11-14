@@ -10,6 +10,7 @@ public class OrbitVisualizer : MonoBehaviour
     private CelestialBody[] _bodies;
     private CelestialBody _this_body;
     private List<Vector3> _positions;
+    private Vector3 _initial_velocity;
 
     // Start is called before the first frame update
     void Start(){
@@ -50,6 +51,8 @@ public class OrbitVisualizer : MonoBehaviour
             velocity = _this_body.initialVelocity;
         }
 
+        _initial_velocity = velocity;
+
         // iterate forward using the simulation system and future timesteps
         for (int i = 0; i < time_into_future; i++){
             acceleration = SimulationSystem.CalculateAcceleration(_positions[i], _this_body); // get current acceleration
@@ -77,6 +80,15 @@ public class OrbitVisualizer : MonoBehaviour
         }
         if (_positions.Count != (time_into_future + 1)){
             return true;
+        }
+        if (Application.isPlaying){
+            if (_initial_velocity != _this_body.velocity){
+                return true;
+            }
+        }else{
+            if (_initial_velocity != _this_body.initialVelocity){
+                return true;
+            }
         }
         return false;
     }
