@@ -17,16 +17,20 @@ public class OrbitVisualizer : MonoBehaviour
         GatherBodies();
         _this_body = gameObject.GetComponent(typeof(CelestialBody)) as CelestialBody;
         _positions = new List<Vector3>();
+
+        LineRenderer lineRenderer = gameObject.AddComponent<LineRenderer>() as LineRenderer;
+        lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+        lineRenderer.widthMultiplier = 5.0f;
+        lineRenderer.positionCount = time_into_future;
     }
 
     // Update is called once per frame
     void Update(){
-    }
-
-    void OnDrawGizmosSelected(){
-        if (draw_orbit){
+        if (draw_orbit)
+        {
             // check if orbit needs to be recalculated and do so
-            if (OrbitNeedsRecalculation()){
+            if (OrbitNeedsRecalculation())
+            {
                 CalculateOrbit();
             }
 
@@ -36,8 +40,10 @@ public class OrbitVisualizer : MonoBehaviour
     }
 
     private void CalculateOrbit(){
-        // clear lists and initialize position and velocity
+        // clear position and line renderer
         _positions.Clear();
+        LineRenderer lineRenderer = GetComponent<LineRenderer>();
+        lineRenderer.positionCount = 0;
 
         // temporary variables used to create positions
         Vector3 acceleration;
@@ -62,13 +68,12 @@ public class OrbitVisualizer : MonoBehaviour
     }
 
     private void DrawOrbit(){
+        // update line renderer positions count
+        LineRenderer lineRenderer = GetComponent<LineRenderer>();
+        lineRenderer.positionCount = time_into_future;
+
         // now iterate down and draw it
-        Vector3 prev = _positions[0];
-        foreach (Vector3 pos in _positions){
-            Gizmos.color = Color.cyan;
-            Gizmos.DrawLine(prev, pos);
-            prev = pos;
-        }
+        lineRenderer.SetPositions(_positions.ToArray());
     }
 
     private bool OrbitNeedsRecalculation(){
