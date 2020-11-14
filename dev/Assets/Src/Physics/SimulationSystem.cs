@@ -10,9 +10,12 @@ public class SimulationSystem : MonoBehaviour
 
     // called on script creation
     void Awake(){
-          bodies = FindObjectsOfType<CelestialBody> ();
-          Time.fixedDeltaTime = Universe.physicsTimeStep;
-          Debug.Log("Setting fixedDeltaTime to: "+Time.fixedDeltaTime);
+        bodies = FindObjectsOfType<CelestialBody> ();
+        for (int i = 0; i < bodies.Length; i++) {
+            Debug.Log(bodies[i].name);
+        }
+        Time.fixedDeltaTime = Universe.physicsTimeStep;
+        Debug.Log("Setting fixedDeltaTime to: "+Time.fixedDeltaTime);
     }
 
     // Fixed Update is called every time.dixedDeltaTime and is independent of framerate

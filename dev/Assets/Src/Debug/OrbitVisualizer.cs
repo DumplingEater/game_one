@@ -5,12 +5,18 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class OrbitVisualizer : MonoBehaviour
 {
+    [Header("Orbit Parameters")]
     public bool draw_orbit;
     public int time_into_future;
+    [Header("For Relative Orbits")]
+    [Tooltip("When a target is set, the orbit trace will show the orbit relative to this target.")]
+    public GameObject target;
+
     private CelestialBody[] _bodies;
     private CelestialBody _this_body;
     private List<Vector3> _positions;
     private Vector3 _initial_velocity;
+    private bool data_shifted = false;
 
     // Start is called before the first frame update
     void Start(){
@@ -19,8 +25,11 @@ public class OrbitVisualizer : MonoBehaviour
         _positions = new List<Vector3>();
 
         LineRenderer lineRenderer = gameObject.AddComponent<LineRenderer>() as LineRenderer;
+        if (lineRenderer == null){
+            lineRenderer = GetComponent<LineRenderer>();
+        }
         lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
-        lineRenderer.widthMultiplier = 5.0f;
+        lineRenderer.widthMultiplier = 1.0f;
         lineRenderer.positionCount = time_into_future;
     }
 
@@ -37,6 +46,16 @@ public class OrbitVisualizer : MonoBehaviour
             // draw the orbit
             DrawOrbit();
         }
+        else
+        {
+            LineRenderer lineRenderer = GetComponent<LineRenderer>();
+            lineRenderer.positionCount = 0;
+        }
+    }
+
+    public void Test()
+    {
+        Debug.Log("hello");
     }
 
     private void CalculateOrbit(){
@@ -71,36 +90,49 @@ public class OrbitVisualizer : MonoBehaviour
         // update line renderer positions count
         LineRenderer lineRenderer = GetComponent<LineRenderer>();
         lineRenderer.positionCount = time_into_future;
+        lineRenderer.widthMultiplier = 2.0f;
+
+        // first check if there's a target
+        if(target != null)
+        {
+            if (!data_shifted){
+                foreach (Vector3 pos in _positions) {
+                    pos.Set(pos.x - target.transform.position.x, pos.y - target.transform.position.y, pos.z - target.transform.position.z);
+                }
+            }
+        }
 
         // now iterate down and draw it
         lineRenderer.SetPositions(_positions.ToArray());
     }
 
     private bool OrbitNeedsRecalculation(){
+        bool recalculate = false;
         if (_positions.Count <= 0){ // first check if there's no positions
-            return true;
+            recalculate = true;
         }
-        if (_positions[0] != _this_body.position){ // 
-            return true;
+        else if (_positions[0] != _this_body.position){ // 
+            recalculate = true;
         }
-        if (_positions.Count != (time_into_future + 1)){
-            return true;
+        else if (_positions.Count != (time_into_future + 1)){
+            recalculate = true;
         }
-        if (Application.isPlaying){
+        else if (Application.isPlaying){
             if (_initial_velocity != _this_body.velocity){
-                return true;
+                recalculate = true;
             }
         }else{
             if (_initial_velocity != _this_body.initialVelocity){
-                return true;
+                recalculate = true;
             }
         }
-        return false;
+        data_shifted = !recalculate;
+        return recalculate;
     }
 
     // gathers celestial bodies from the scene.
     private void GatherBodies(){
         _bodies = FindObjectsOfType<CelestialBody>();
     }
-    
+
 }
