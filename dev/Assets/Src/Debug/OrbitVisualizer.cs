@@ -75,9 +75,6 @@ public class OrbitVisualizer : MonoBehaviour
         if (_positions[0] != _this_body.position){ // 
             return true;
         }
-        if (_velocities[0] != _this_body.velocity){
-            return true;
-        }
         if (_positions.Count != (time_into_future + 1)){
             return true;
         }
